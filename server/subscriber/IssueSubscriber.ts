@@ -1,5 +1,9 @@
 import TheMovieDb from '@server/api/themoviedb';
-import { IssueStatus, IssueType, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  IssueType,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import { MediaType } from '@server/constants/media';
 import Issue from '@server/entity/Issue';
 import notificationManager, { Notification } from '@server/lib/notifications';
@@ -63,18 +67,27 @@ export class IssueSubscriber implements EntitySubscriberInterface<Issue> {
           type === Notification.ISSUE_CREATED
             ? `New ${
                 entity.issueType !== IssueType.OTHER
-                  ? `${IssueTypeName[entity.issueType]} `
+                  ? `${formatIssueTypeName(
+                      entity.issueType,
+                      entity.customType
+                    )} `
                   : ''
               }Issue Reported`
             : type === Notification.ISSUE_RESOLVED
             ? `${
                 entity.issueType !== IssueType.OTHER
-                  ? `${IssueTypeName[entity.issueType]} `
+                  ? `${formatIssueTypeName(
+                      entity.issueType,
+                      entity.customType
+                    )} `
                   : ''
               }Issue Resolved`
             : `${
                 entity.issueType !== IssueType.OTHER
-                  ? `${IssueTypeName[entity.issueType]} `
+                  ? `${formatIssueTypeName(
+                      entity.issueType,
+                      entity.customType
+                    )} `
                   : ''
               }Issue Reopened`,
         subject: title,

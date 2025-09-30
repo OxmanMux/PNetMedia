@@ -6,6 +6,7 @@ import { Permission, useUser } from '@app/hooks/useUser';
 import globalMessages from '@app/i18n/globalMessages';
 import { RadioGroup } from '@headlessui/react';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
+import { IssueType } from '@server/constants/issue';
 import { MediaStatus } from '@server/constants/media';
 import type Issue from '@server/entity/Issue';
 import type { MovieDetails } from '@server/models/Movie';
@@ -20,6 +21,8 @@ import * as Yup from 'yup';
 
 const messages = defineMessages({
   validationMessageRequired: 'You must provide a description',
+  validationCustomIssueNameRequired:
+    'You must provide a name for your custom issue.',
   whatswrong: "What's wrong?",
   providedetail:
     'Please provide a detailed explanation of the issue you encountered.',
@@ -36,6 +39,8 @@ const messages = defineMessages({
   toastviewissue: 'View Issue',
   reportissue: 'Report an Issue',
   submitissue: 'Submit Issue',
+  customissuename: 'Custom issue name',
+  customissuenameplaceholder: 'Give this issue a title',
 });
 
 const isMovie = (movie: MovieDetails | TvDetails): movie is MovieDetails => {
@@ -87,6 +92,17 @@ const CreateIssueModal = ({
     message: Yup.string().required(
       intl.formatMessage(messages.validationMessageRequired)
     ),
+    customIssueName: Yup.string().when('selectedIssue', {
+      is: (issue: { issueType: IssueType }) =>
+        issue?.issueType === IssueType.CUSTOM,
+      then: Yup.string()
+        .trim()
+        .required(
+          intl.formatMessage(messages.validationCustomIssueNameRequired)
+        )
+        .max(255),
+      otherwise: Yup.string().trim().nullable(),
+    }),
   });
 
   return (
@@ -96,6 +112,7 @@ const CreateIssueModal = ({
         message: '',
         problemSeason: availableSeasons.length === 1 ? availableSeasons[0] : 0,
         problemEpisode: 0,
+        customIssueName: '',
       }}
       validationSchema={CreateIssueModalSchema}
       onSubmit={async (values) => {
@@ -107,6 +124,10 @@ const CreateIssueModal = ({
             problemSeason: values.problemSeason,
             problemEpisode:
               values.problemSeason > 0 ? values.problemEpisode : 0,
+            customType:
+              values.selectedIssue.issueType === IssueType.CUSTOM
+                ? values.customIssueName.trim()
+                : undefined,
           });
 
           if (data) {
@@ -237,7 +258,12 @@ const CreateIssueModal = ({
             )}
             <RadioGroup
               value={values.selectedIssue}
-              onChange={(issue) => setFieldValue('selectedIssue', issue)}
+              onChange={(issue) => {
+                setFieldValue('selectedIssue', issue);
+                if (issue.issueType !== IssueType.CUSTOM) {
+                  setFieldValue('customIssueName', '');
+                }
+              }}
               className="mt-4"
             >
               <RadioGroup.Label className="sr-only">
@@ -309,6 +335,28 @@ const CreateIssueModal = ({
                   <div className="error">{errors.message}</div>
                 )}
             </div>
+            {values.selectedIssue.issueType === IssueType.CUSTOM && (
+              <div className="mt-4 flex-col space-y-2">
+                <label htmlFor="customIssueName">
+                  {intl.formatMessage(messages.customissuename)}
+                  <span className="label-required">*</span>
+                </label>
+                <Field
+                  as="input"
+                  type="text"
+                  name="customIssueName"
+                  id="customIssueName"
+                  placeholder={intl.formatMessage(
+                    messages.customissuenameplaceholder
+                  )}
+                />
+                {errors.customIssueName &&
+                  touched.customIssueName &&
+                  typeof errors.customIssueName === 'string' && (
+                    <div className="error">{errors.customIssueName}</div>
+                  )}
+              </div>
+            )}
           </Modal>
         );
       }}

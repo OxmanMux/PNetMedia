@@ -8,8 +8,14 @@ import {
   UserIcon,
 } from '@heroicons/react/24/solid';
 import type Issue from '@server/entity/Issue';
+import { IssueType } from '@server/constants/issue';
 import Link from 'next/link';
-import { useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
+
+const messages = defineMessages({
+  customissuetype: 'Custom',
+  unknownissuetype: 'Unknown',
+});
 
 interface IssueBlockProps {
   issue: Issue;
@@ -22,9 +28,12 @@ const IssueBlock = ({ issue }: IssueBlockProps) => {
     (opt) => opt.issueType === issue.issueType
   );
 
-  if (!issueOption) {
-    return null;
-  }
+  const issueTypeLabel =
+    issue.issueType === IssueType.CUSTOM
+      ? issue.customType || intl.formatMessage(messages.customissuetype)
+      : issueOption
+      ? intl.formatMessage(issueOption.name)
+      : intl.formatMessage(messages.unknownissuetype);
 
   return (
     <div className="px-4 py-3 text-gray-300">
@@ -33,7 +42,7 @@ const IssueBlock = ({ issue }: IssueBlockProps) => {
           <div className="flex flex-nowrap">
             <ExclamationTriangleIcon className="mr-1.5 h-5 w-5 flex-shrink-0" />
             <span className="w-40 truncate md:w-auto">
-              {intl.formatMessage(issueOption.name)}
+              {issueTypeLabel}
             </span>
           </div>
           <div className="white mb-1 flex flex-nowrap">

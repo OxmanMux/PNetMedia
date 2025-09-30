@@ -1,5 +1,5 @@
 import TheMovieDb from '@server/api/themoviedb';
-import { IssueType, IssueTypeName } from '@server/constants/issue';
+import { IssueType, formatIssueTypeName } from '@server/constants/issue';
 import { MediaType } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import IssueComment from '@server/entity/IssueComment';
@@ -64,7 +64,7 @@ export class IssueCommentSubscriber
         notificationManager.sendNotification(Notification.ISSUE_COMMENT, {
           event: `New Comment on ${
             issue.issueType !== IssueType.OTHER
-              ? `${IssueTypeName[issue.issueType]} `
+              ? `${formatIssueTypeName(issue.issueType, issue.customType)} `
               : ''
           }Issue`,
           subject: title,

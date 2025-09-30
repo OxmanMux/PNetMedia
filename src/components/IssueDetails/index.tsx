@@ -19,7 +19,7 @@ import {
   ServerIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
-import { IssueStatus } from '@server/constants/issue';
+import { IssueStatus, IssueType } from '@server/constants/issue';
 import { MediaType } from '@server/constants/media';
 import type Issue from '@server/entity/Issue';
 import type { MovieDetails } from '@server/models/Movie';
@@ -67,6 +67,7 @@ const messages = defineMessages({
   toastissuedeletefailed: 'Something went wrong while deleting the issue.',
   nocomments: 'No comments.',
   unknownissuetype: 'Unknown',
+  customissuetype: 'Custom',
   commentplaceholder: 'Add a comment…',
 });
 
@@ -103,6 +104,14 @@ const IssueDetails = () => {
   const issueOption = issueOptions.find(
     (opt) => opt.issueType === issueData?.issueType
   );
+
+  const issueTypeLabel = issueData
+    ? issueData.issueType === IssueType.CUSTOM
+      ? issueData.customType || intl.formatMessage(messages.customissuetype)
+      : issueOption
+      ? intl.formatMessage(issueOption.name)
+      : intl.formatMessage(messages.unknownissuetype)
+    : intl.formatMessage(messages.unknownissuetype);
 
   if (!data && !error) {
     return <LoadingSpinner />;
@@ -313,9 +322,7 @@ const IssueDetails = () => {
               <div className="media-fact">
                 <span>{intl.formatMessage(messages.issuetype)}</span>
                 <span className="media-fact-value">
-                  {intl.formatMessage(
-                    issueOption?.name ?? messages.unknownissuetype
-                  )}
+                  {issueTypeLabel}
                 </span>
               </div>
               {issueData.media.mediaType === MediaType.TV && (
@@ -551,9 +558,7 @@ const IssueDetails = () => {
             <div className="media-fact">
               <span>{intl.formatMessage(messages.issuetype)}</span>
               <span className="media-fact-value">
-                {intl.formatMessage(
-                  issueOption?.name ?? messages.unknownissuetype
-                )}
+                {issueTypeLabel}
               </span>
             </div>
             {issueData.media.mediaType === MediaType.TV && (

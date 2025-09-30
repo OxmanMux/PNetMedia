@@ -1,4 +1,7 @@
-import { IssueStatus, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import type { NotificationAgentGotify } from '@server/lib/settings';
 import { getSettings } from '@server/lib/settings';
 import logger from '@server/logger';
@@ -80,7 +83,10 @@ class GotifyAgent
       message += `\nComment from ${payload.comment.user.displayName}:\n${payload.comment.message}`;
     } else if (payload.issue) {
       message += `\n\nReported By: ${payload.issue.createdBy.displayName}`;
-      message += `\nIssue Type: ${IssueTypeName[payload.issue.issueType]}`;
+      message += `\nIssue Type: ${formatIssueTypeName(
+        payload.issue.issueType,
+        payload.issue.customType
+      )}`;
       message += `\nIssue Status: ${
         payload.issue.status === IssueStatus.OPEN ? 'Open' : 'Resolved'
       }`;
