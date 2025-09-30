@@ -1,4 +1,7 @@
-import { IssueStatus, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import { getRepository } from '@server/datasource';
 import { User } from '@server/entity/User';
 import type { NotificationAgentDiscord } from '@server/lib/settings';
@@ -168,7 +171,10 @@ class DiscordAgent
         },
         {
           name: 'Issue Type',
-          value: IssueTypeName[payload.issue.issueType],
+          value: formatIssueTypeName(
+            payload.issue.issueType,
+            payload.issue.customType
+          ),
           inline: true,
         },
         {

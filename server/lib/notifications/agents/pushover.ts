@@ -1,4 +1,7 @@
-import { IssueStatus, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import { MediaStatus } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import { User } from '@server/entity/User';
@@ -127,7 +130,10 @@ class PushoverAgent
     } else if (payload.issue) {
       message += `<small>\n\n<b>Reported By:</b> ${payload.issue.createdBy.displayName}</small>`;
       message += `<small>\n<b>Issue Type:</b> ${
-        IssueTypeName[payload.issue.issueType]
+        formatIssueTypeName(
+          payload.issue.issueType,
+          payload.issue.customType
+        )
       }</small>`;
       message += `<small>\n<b>Issue Status:</b> ${
         payload.issue.status === IssueStatus.OPEN ? 'Open' : 'Resolved'

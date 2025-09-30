@@ -5,7 +5,7 @@ import { issueOptions } from '@app/components/IssueModal/constants';
 import { Permission, useUser } from '@app/hooks/useUser';
 import globalMessages from '@app/i18n/globalMessages';
 import { EyeIcon } from '@heroicons/react/24/solid';
-import { IssueStatus } from '@server/constants/issue';
+import { IssueStatus, IssueType } from '@server/constants/issue';
 import { MediaType } from '@server/constants/media';
 import type Issue from '@server/entity/Issue';
 import type { MovieDetails } from '@server/models/Movie';
@@ -25,6 +25,7 @@ const messages = defineMessages({
   opened: 'Opened',
   viewissue: 'View Issue',
   unknownissuetype: 'Unknown',
+  customissuetype: 'Custom',
 });
 
 const isMovie = (movie: MovieDetails | TvDetails): movie is MovieDetails => {
@@ -65,6 +66,13 @@ const IssueItem = ({ issue }: IssueItemProps) => {
   const issueOption = issueOptions.find(
     (opt) => opt.issueType === issue?.issueType
   );
+
+  const issueTypeLabel =
+    issue.issueType === IssueType.CUSTOM
+      ? issue.customType || intl.formatMessage(messages.customissuetype)
+      : issueOption
+      ? intl.formatMessage(issueOption.name)
+      : intl.formatMessage(messages.unknownissuetype);
 
   const problemSeasonEpisodeLine: React.ReactNode[] = [];
 
@@ -196,9 +204,7 @@ const IssueItem = ({ issue }: IssueItemProps) => {
               {intl.formatMessage(messages.issuetype)}
             </span>
             <span className="flex truncate text-sm text-gray-300">
-              {intl.formatMessage(
-                issueOption?.name ?? messages.unknownissuetype
-              )}
+              {issueTypeLabel}
             </span>
           </div>
           <div className="card-field">

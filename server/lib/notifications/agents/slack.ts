@@ -1,4 +1,7 @@
-import { IssueStatus, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import type { NotificationAgentSlack } from '@server/lib/settings';
 import { getSettings } from '@server/lib/settings';
 import logger from '@server/logger';
@@ -112,7 +115,10 @@ class SlackAgent
         },
         {
           type: 'mrkdwn',
-          text: `*Issue Type*\n${IssueTypeName[payload.issue.issueType]}`,
+          text: `*Issue Type*\n${formatIssueTypeName(
+            payload.issue.issueType,
+            payload.issue.customType
+          )}`,
         },
         {
           type: 'mrkdwn',

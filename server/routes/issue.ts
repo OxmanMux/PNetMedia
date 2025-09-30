@@ -103,6 +103,7 @@ issueRoutes.post<
     issueType: number;
     problemSeason: number;
     problemEpisode: number;
+    customType?: string;
   }
 >(
   '/',
@@ -126,11 +127,21 @@ issueRoutes.post<
       return next({ status: 404, message: 'Media does not exist.' });
     }
 
+    const customType = req.body.customType?.trim();
+
+    if (req.body.issueType === IssueType.CUSTOM && !customType) {
+      return next({
+        status: 400,
+        message: 'Custom issue type must include a name.',
+      });
+    }
+
     const issue = new Issue({
       createdBy: req.user,
       issueType: req.body.issueType,
       problemSeason: req.body.problemSeason,
       problemEpisode: req.body.problemEpisode,
+      customType: req.body.issueType === IssueType.CUSTOM ? customType : null,
       media,
       comments: [
         new IssueComment({
@@ -172,6 +183,12 @@ issueRoutes.get('/count', async (req, res, next) => {
       })
       .getCount();
 
+    const customCount = await query
+      .where('issue.issueType = :issueType', {
+        issueType: IssueType.CUSTOM,
+      })
+      .getCount();
+
     const othersCount = await query
       .where('issue.issueType = :issueType', {
         issueType: IssueType.OTHER,
@@ -195,6 +212,7 @@ issueRoutes.get('/count', async (req, res, next) => {
       video: videoCount,
       audio: audioCount,
       subtitles: subtitlesCount,
+      custom: customCount,
       others: othersCount,
       open: openCount,
       closed: closedCount,

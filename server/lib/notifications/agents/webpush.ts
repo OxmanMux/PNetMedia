@@ -1,4 +1,7 @@
-import { IssueType, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueType,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import { MediaRequestStatus, MediaType } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import MediaRequest from '@server/entity/MediaRequest';
@@ -51,7 +54,10 @@ class WebPushAgent
 
     const issueType = payload.issue
       ? payload.issue.issueType !== IssueType.OTHER
-        ? `${IssueTypeName[payload.issue.issueType].toLowerCase()} issue`
+        ? `${formatIssueTypeName(
+            payload.issue.issueType,
+            payload.issue.customType
+          ).toLowerCase()} issue`
         : 'issue'
       : undefined;
 

@@ -21,6 +21,9 @@ class Issue {
   @Column({ type: 'int' })
   public issueType: IssueType;
 
+  @Column({ type: 'varchar', nullable: true })
+  public customType?: string;
+
   @Column({ type: 'int', default: IssueStatus.OPEN })
   public status: IssueStatus;
 

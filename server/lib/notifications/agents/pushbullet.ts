@@ -1,4 +1,7 @@
-import { IssueStatus, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import { MediaStatus } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import { User } from '@server/entity/User';
@@ -84,7 +87,10 @@ class PushbulletAgent
       body += `\n\nComment from ${payload.comment.user.displayName}:\n${payload.comment.message}`;
     } else if (payload.issue) {
       body += `\n\nReported By: ${payload.issue.createdBy.displayName}`;
-      body += `\nIssue Type: ${IssueTypeName[payload.issue.issueType]}`;
+      body += `\nIssue Type: ${formatIssueTypeName(
+        payload.issue.issueType,
+        payload.issue.customType
+      )}`;
       body += `\nIssue Status: ${
         payload.issue.status === IssueStatus.OPEN ? 'Open' : 'Resolved'
       }`;

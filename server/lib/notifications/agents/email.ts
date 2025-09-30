@@ -1,4 +1,4 @@
-import { IssueType, IssueTypeName } from '@server/constants/issue';
+import { IssueType, formatIssueTypeName } from '@server/constants/issue';
 import { MediaType } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import { User } from '@server/entity/User';
@@ -143,7 +143,10 @@ class EmailAgent
     } else if (payload.issue) {
       const issueType =
         payload.issue && payload.issue.issueType !== IssueType.OTHER
-          ? `${IssueTypeName[payload.issue.issueType].toLowerCase()} issue`
+        ? `${formatIssueTypeName(
+            payload.issue.issueType,
+            payload.issue.customType
+          ).toLowerCase()} issue`
           : 'issue';
 
       let body = '';

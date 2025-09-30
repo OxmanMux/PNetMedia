@@ -1,4 +1,7 @@
-import { IssueStatus, IssueTypeName } from '@server/constants/issue';
+import {
+  IssueStatus,
+  formatIssueTypeName,
+} from '@server/constants/issue';
 import { MediaStatus } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import { User } from '@server/entity/User';
@@ -115,7 +118,10 @@ class TelegramAgent
       message += `\n\n\*Reported By:\* ${this.escapeText(
         payload.issue.createdBy.displayName
       )}`;
-      message += `\n\*Issue Type:\* ${IssueTypeName[payload.issue.issueType]}`;
+      message += `\n\*Issue Type:\* ${formatIssueTypeName(
+        payload.issue.issueType,
+        payload.issue.customType
+      )}`;
       message += `\n\*Issue Status:\* ${
         payload.issue.status === IssueStatus.OPEN ? 'Open' : 'Resolved'
       }`;
